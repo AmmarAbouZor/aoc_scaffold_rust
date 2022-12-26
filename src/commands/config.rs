@@ -54,7 +54,7 @@ impl GetYearCommand {
     fn run(&self) -> Result<()> {
         let conf = config::load()?;
 
-        eprintln!("year is: {}", conf.year);
+        println!("year is: '{}'", conf.year);
 
         Ok(())
     }
@@ -63,12 +63,16 @@ impl GetYearCommand {
 /// set the current year in the settings
 #[derive(Args, Debug)]
 #[command()]
-struct SetYearCommand {
+pub struct SetYearCommand {
     year: String,
 }
 
 impl SetYearCommand {
-    fn run(&self) -> Result<()> {
+    pub fn new(year: String) -> Self {
+        Self { year }
+    }
+
+    pub fn run(&self) -> Result<()> {
         let mut conf = config::load()?;
 
         conf.year = self.year.clone();
