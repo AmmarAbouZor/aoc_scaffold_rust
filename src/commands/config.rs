@@ -1,5 +1,7 @@
+use anyhow::Context;
 use anyhow::Result;
 use clap::{Args, Subcommand};
+use edit;
 
 use crate::config;
 
@@ -13,9 +15,10 @@ pub struct Command {
 
 #[derive(Subcommand, Debug)]
 enum SubCommands {
-    GetPath(GetPathCommand),
-    GetYear(GetYearCommand),
     SetYear(SetYearCommand),
+    GetYear(GetYearCommand),
+    Open(OpenConfigCommand),
+    GetPath(GetPathCommand),
 }
 
 impl Command {
@@ -24,6 +27,7 @@ impl Command {
             SubCommands::GetPath(cmd) => cmd.run(),
             SubCommands::SetYear(cmd) => cmd.run(),
             SubCommands::GetYear(cmd) => cmd.run(),
+            SubCommands::Open(cmd) => cmd.run(),
         }
     }
 }
@@ -70,6 +74,19 @@ impl SetYearCommand {
         conf.year = self.year.clone();
         config::save(conf)?;
 
+        Ok(())
+    }
+}
+
+/// open the config file in the default text editor
+#[derive(Args, Debug)]
+#[command()]
+struct OpenConfigCommand {}
+
+impl OpenConfigCommand {
+    fn run(&self) -> Result<()> {
+        let path = config::get_path()?;
+        edit::edit_file(path).context("couln't open the config file with the default Editor")?;
         Ok(())
     }
 }
