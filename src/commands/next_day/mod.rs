@@ -1,8 +1,9 @@
 use anyhow::{bail, Result};
 use clap::Args;
-use std::{env, io};
+use std::{env, io, path::PathBuf};
 
 use crate::{commands::config::SetYearCommand, config};
+mod src_scaff;
 
 /// scaffold the the repo incrementing the current day and adding a new year if the current year doesn't existed.
 #[derive(Args, Debug)]
@@ -19,8 +20,13 @@ pub struct Command {
 
 impl Command {
     pub fn run(&self) -> Result<()> {
-        self.check_current_directory()?;
+        // let current_directory = self.check_current_directory()?;
+        // TODO reactivate current directory and delete env VAR from bashrc and fish
+
+        let current_directory = PathBuf::from(env::var("AOC_TEST_PATH")?);
         self.validate_config()?;
+        let config = config::load()?;
+        src_scaff::scaff_next_day(&current_directory, &config.year)?;
         Ok(())
     }
 
@@ -51,9 +57,8 @@ impl Command {
     /// # Errors
     ///
     /// This function will return an error if any of the files 'Cargo.toml' or 'main.rs' doesn't exist or an io Error.
-    fn check_current_directory(&self) -> Result<()> {
+    fn check_current_directory(&self) -> Result<PathBuf> {
         let current_directory = env::current_dir()?;
-        let current_directory = current_directory.as_path();
         let cargo_path = current_directory.join("Cargo.toml");
         if !cargo_path.try_exists()? {
             bail!("current directory isn't rust project. 'Cargo.toml' could't be found")
@@ -65,6 +70,6 @@ impl Command {
             bail!("current directory isn't rust project. 'main.rs' could't be found")
         }
 
-        Ok(())
+        Ok(current_directory)
     }
 }
