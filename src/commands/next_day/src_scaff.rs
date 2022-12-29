@@ -1,5 +1,8 @@
+use anyhow::Context;
 use anyhow::Result;
 use lazy_static::lazy_static;
+use regex;
+use regex::Regex;
 use std::{fs, path::PathBuf};
 
 pub fn scaff_next_day(current_dir: &PathBuf, year: &str) -> Result<u8> {
@@ -33,7 +36,7 @@ fn create_year(src_path: &PathBuf, year: &str) -> Result<u8> {
 
     generate_day_file(&year_dir_path, 1)?;
     generate_year_file(src_path, year)?;
-    // TODO manipulate main
+    add_year_main(src_path, year)?;
     Ok(1)
 }
 
@@ -89,5 +92,71 @@ fn run_day(day: u8) {
 
     let file_path = dir_path.join(get_year_name(year)).with_extension("rs");
     fs::write(file_path, YEAR_TEMPLATE.clone())?;
+    Ok(())
+}
+
+fn add_year_main(dir_path: &PathBuf, year: &str) -> Result<()> {
+    let main_path = dir_path.join("main.rs");
+    let mut text = fs::read_to_string(main_path.clone())?;
+
+    // insert mod
+    let insert_mod_index = {
+        if let Some(last_entry) = text.rfind("mod year_") {
+            let mut insert_index = text[last_entry..]
+                .find(";")
+                .context("main content is changed outside of this program")?;
+
+            insert_index += last_entry;
+
+            text.insert(insert_index + 1, '\n');
+
+            insert_index + 2
+        } else {
+            text.insert_str(0, "\n\n");
+            0
+        }
+    };
+
+    let year_mod = format!("mod {};", get_year_name(year));
+
+    text.insert_str(insert_mod_index, &year_mod);
+
+    // insert in main and run_year functions
+    let run_func_with_arg = format!("run_year(\"{year}\");");
+    let year_match = format!("\"{year}\" => {}::run(),\n        ", get_year_name(year));
+    if let Some(_) = text.find("run_year(\"") {
+        lazy_static! {
+            static ref YEAR_ARG_REGEX: Regex = Regex::new(r#"run_year\("."\);"#).unwrap();
+        }
+
+        text = YEAR_ARG_REGEX.replace(&text, run_func_with_arg).into();
+
+        // year match
+        let insert_index_match = text
+            .find(r#"_ => unreachable!("year not implemented")"#)
+            .context("main content is changed outside of this program")?;
+
+        text.insert_str(insert_index_match, &year_match);
+    } else {
+        let search_parr_main = r" main() {";
+        let main_index = text
+            .find(&search_parr_main)
+            .context("main content is changed outside of this program, main fn can't be found")?;
+
+        let inser_text = format!("\n    {run_func_with_arg}\n");
+        text.insert_str(main_index + search_parr_main.len(), &inser_text);
+        // create add_year + add it to main
+        let run_year_func = format!(
+            r#"fn run_year(year: &str) {{
+    match year {{
+        {year_match}_ => unreachable!("year not implemented"),
+    }}
+}}"#
+        );
+
+        text.push_str(&run_year_func);
+    }
+
+    fs::write(main_path, text)?;
     Ok(())
 }
