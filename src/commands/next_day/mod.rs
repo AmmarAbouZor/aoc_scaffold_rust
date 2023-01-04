@@ -1,6 +1,6 @@
-use anyhow::{bail, Result};
+use anyhow::{bail, Context, Result};
 use clap::Args;
-use std::{env, io, path::PathBuf};
+use std::{env, fs, io, path::PathBuf};
 
 use crate::{commands::config::SetYearCommand, config};
 mod src_scaff;
@@ -26,15 +26,31 @@ impl Command {
         let current_directory = PathBuf::from(env::var("AOC_TEST_PATH")?);
         self.validate_config()?;
         let config = config::load()?;
-        src_scaff::scaff_next_day(&current_directory, &config.year)?;
+        let day_num = src_scaff::scaff_next_day(&current_directory, &config.year)?;
+        if self.input {
+            let input_dir = current_directory
+                .join("input")
+                .join(src_scaff::get_year_dir_name(&config.year));
+            fs::create_dir_all(&input_dir)?;
+            let file_name = input_dir
+                .join(src_scaff::get_day_name(day_num))
+                .with_extension("txt");
+            fs::File::create(&file_name)?;
+            println!(
+                "Input file '{}' has been created",
+                file_name.to_string_lossy()
+            );
+
+            if self.open_input {
+                edit::edit_file(file_name)
+                    .context("couln't open the input file with the default Editor")?;
+            }
+        }
+
         Ok(())
     }
 
     /// Checks if the year is set. If not it asks the user to set it and save it to the configs.
-    ///
-    /// # Errors
-    ///
-    /// This function will return an error if .
     fn validate_config(&self) -> Result<()> {
         let config = config::load()?;
         if config.year.is_empty() {

@@ -16,7 +16,7 @@ pub fn scaff_next_day(current_dir: &PathBuf, year: &str) -> Result<u8> {
     }
 }
 
-fn get_year_dir_name(year: &str) -> String {
+pub fn get_year_dir_name(year: &str) -> String {
     format!("year_{year}")
 }
 
@@ -36,7 +36,7 @@ fn create_year(src_path: &PathBuf, year: &str) -> Result<u8> {
     Ok(1)
 }
 
-fn get_day_name(day: u8) -> String {
+pub fn get_day_name(day: u8) -> String {
     format!("day_{:02}", day)
 }
 
