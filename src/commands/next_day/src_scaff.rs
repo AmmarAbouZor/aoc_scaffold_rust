@@ -1,11 +1,14 @@
 use anyhow::{bail, Context, Result};
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::{fs, path::PathBuf};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 
 use crate::commands;
 
-pub fn scaff_next_day(current_dir: &PathBuf, year: &str) -> Result<u8> {
+pub fn scaff_next_day(current_dir: &Path, year: &str) -> Result<u8> {
     let src_path = current_dir.join("src");
 
     let year_file = src_path.join(get_year_file_name(year));
@@ -20,7 +23,7 @@ fn get_year_file_name(year: &str) -> String {
     format!("{}.rs", commands::get_year_name(year))
 }
 
-fn create_year(src_path: &PathBuf, year: &str) -> Result<u8> {
+fn create_year(src_path: &Path, year: &str) -> Result<u8> {
     println!("year '{year}' doesn't exist yet. creating year '{year}'...");
 
     let year_dir_path = src_path.join(commands::get_year_name(year));
@@ -32,7 +35,7 @@ fn create_year(src_path: &PathBuf, year: &str) -> Result<u8> {
     Ok(1)
 }
 
-fn generate_day_file(year_dir_path: &PathBuf, day: u8) -> Result<()> {
+fn generate_day_file(year_dir_path: &Path, day: u8) -> Result<()> {
     lazy_static! {
         static ref DAY_TEMPLATE: &'static str = r"fn part_1() {}
 fn part_2() {}
@@ -54,12 +57,12 @@ mod test {
     let file_path = year_dir_path
         .join(commands::get_day_name(day))
         .with_extension("rs");
-    fs::write(file_path, DAY_TEMPLATE.clone())?;
+    fs::write(file_path, *DAY_TEMPLATE)?;
 
     Ok(())
 }
 
-fn generate_year_file(dir_path: &PathBuf, year: &str) -> Result<()> {
+fn generate_year_file(dir_path: &Path, year: &str) -> Result<()> {
     lazy_static! {
         static ref YEAR_TEMPLATE: &'static str = r#"mod day_01;
 
@@ -79,11 +82,11 @@ fn run_day(day: u8) {
     let file_path = dir_path
         .join(commands::get_year_name(year))
         .with_extension("rs");
-    fs::write(file_path, YEAR_TEMPLATE.clone())?;
+    fs::write(file_path, *YEAR_TEMPLATE)?;
     Ok(())
 }
 
-fn insert_year_main(dir_path: &PathBuf, year: &str) -> Result<()> {
+fn insert_year_main(dir_path: &Path, year: &str) -> Result<()> {
     let main_path = dir_path.join("main.rs");
     let mut text = fs::read_to_string(main_path.clone())?;
 
@@ -91,7 +94,7 @@ fn insert_year_main(dir_path: &PathBuf, year: &str) -> Result<()> {
     let insert_mod_index = {
         if let Some(last_entry) = text.rfind("mod year_") {
             let mut insert_index = text[last_entry..]
-                .find(";")
+                .find(';')
                 .context("main content is changed outside of this program")?;
 
             insert_index += last_entry;
@@ -115,7 +118,7 @@ fn insert_year_main(dir_path: &PathBuf, year: &str) -> Result<()> {
         "\"{year}\" => {}::run(),\n        ",
         commands::get_year_name(year)
     );
-    if let Some(_) = text.find("run_year(\"") {
+    if text.contains("run_year(\"") {
         lazy_static! {
             static ref YEAR_ARG_REGEX: Regex = Regex::new(r#"run_year\("."\);"#).unwrap();
         }
@@ -131,7 +134,7 @@ fn insert_year_main(dir_path: &PathBuf, year: &str) -> Result<()> {
     } else {
         let search_parr_main = r" main() {";
         let main_index = text
-            .find(&search_parr_main)
+            .find(search_parr_main)
             .context("main content is changed outside of this program, main fn can't be found")?;
 
         let inser_text = format!("\n    {run_func_with_arg}\n");
@@ -152,7 +155,7 @@ fn insert_year_main(dir_path: &PathBuf, year: &str) -> Result<()> {
     Ok(())
 }
 
-fn append_next_day(src_path: &PathBuf, year: &str) -> Result<u8> {
+fn append_next_day(src_path: &Path, year: &str) -> Result<u8> {
     let year_dir_path = src_path.join(commands::get_year_name(year));
 
     let last_day_num = commands::get_last_day(&year_dir_path)?;
@@ -171,7 +174,7 @@ fn insert_day_in_year(year_file_path: &PathBuf, day: u8) -> Result<()> {
     let insert_mod_index = {
         if let Some(last_entry) = text.rfind("mod day_") {
             let mut insert_index = text[last_entry..]
-                .find(";")
+                .find(';')
                 .context("year content is changed outside of this program")?;
 
             insert_index += last_entry;
@@ -190,7 +193,7 @@ fn insert_day_in_year(year_file_path: &PathBuf, day: u8) -> Result<()> {
     text.insert_str(insert_mod_index, &day_mod);
 
     // insert in run functions
-    if let Some(_) = text.find("run_day(") {
+    if text.contains("run_day(") {
         lazy_static! {
             static ref DAY_FUNC_REGEX: Regex = Regex::new(r#"run_day\(.\);"#).unwrap();
         }

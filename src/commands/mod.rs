@@ -70,8 +70,7 @@ pub fn get_last_day(year_dir_path: &PathBuf) -> Result<u8> {
 
     let last_day = fs::read_dir(year_dir_path)?
         .flatten()
-        .map(|file_path| file_path.file_name().into_string())
-        .flatten()
+        .flat_map(|file_path| file_path.file_name().into_string())
         .filter(|file| {
             file.starts_with("day_") && file.ends_with(".rs") && file.len() == DAY_FILE_LENGTH
         })

@@ -1,7 +1,6 @@
 use anyhow::Context;
 use anyhow::Result;
 use clap::{Args, Subcommand};
-use edit;
 
 use crate::config;
 

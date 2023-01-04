@@ -1,5 +1,4 @@
 use anyhow::{Context, Result};
-use confy;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 

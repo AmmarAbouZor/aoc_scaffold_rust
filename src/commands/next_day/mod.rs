@@ -8,7 +8,7 @@ use crate::{
 };
 mod src_scaff;
 
-/// scaffold the the repo incrementing the current day and adding a new year if the current year doesn't existed.
+/// scaffold the the repo incrementing the current day and adding a new year if the current year doesn't exist.
 #[derive(Args, Debug)]
 #[command()]
 pub struct Command {
