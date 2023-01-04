@@ -1,8 +1,11 @@
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result};
 use clap::Args;
-use std::{env, fs, io, path::PathBuf};
+use std::{fs, io};
 
-use crate::{commands::config::SetYearCommand, config};
+use crate::{
+    commands::{self, config::SetYearCommand},
+    config,
+};
 mod src_scaff;
 
 /// scaffold the the repo incrementing the current day and adding a new year if the current year doesn't existed.
@@ -20,20 +23,17 @@ pub struct Command {
 
 impl Command {
     pub fn run(&self) -> Result<()> {
-        // let current_directory = self.check_current_directory()?;
-        // TODO reactivate current directory and delete env VAR from bashrc and fish
-
-        let current_directory = PathBuf::from(env::var("AOC_TEST_PATH")?);
+        let current_directory = crate::commands::get_project_directory()?;
         self.validate_config()?;
         let config = config::load()?;
         let day_num = src_scaff::scaff_next_day(&current_directory, &config.year)?;
         if self.input {
             let input_dir = current_directory
                 .join("input")
-                .join(src_scaff::get_year_dir_name(&config.year));
+                .join(commands::get_year_name(&config.year));
             fs::create_dir_all(&input_dir)?;
             let file_name = input_dir
-                .join(src_scaff::get_day_name(day_num))
+                .join(commands::get_day_name(day_num))
                 .with_extension("txt");
             fs::File::create(&file_name)?;
             println!(
@@ -66,26 +66,5 @@ impl Command {
         }
 
         Ok(())
-    }
-
-    /// Checks if the current directory is an executable rust project.
-    ///
-    /// # Errors
-    ///
-    /// This function will return an error if any of the files 'Cargo.toml' or 'main.rs' doesn't exist or an io Error.
-    fn check_current_directory(&self) -> Result<PathBuf> {
-        let current_directory = env::current_dir()?;
-        let cargo_path = current_directory.join("Cargo.toml");
-        if !cargo_path.try_exists()? {
-            bail!("current directory isn't rust project. 'Cargo.toml' could't be found")
-        }
-
-        let main_path = current_directory.join("src").join("main.rs");
-
-        if !main_path.try_exists()? {
-            bail!("current directory isn't rust project. 'main.rs' could't be found")
-        }
-
-        Ok(current_directory)
     }
 }
