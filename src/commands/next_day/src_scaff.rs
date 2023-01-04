@@ -57,7 +57,9 @@ mod test {
     let file_path = year_dir_path
         .join(commands::get_day_name(day))
         .with_extension("rs");
-    fs::write(file_path, *DAY_TEMPLATE)?;
+    fs::write(&file_path, *DAY_TEMPLATE)?;
+
+    println!("File '{}' has been created", file_path.to_string_lossy());
 
     Ok(())
 }

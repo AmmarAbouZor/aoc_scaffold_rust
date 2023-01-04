@@ -36,10 +36,7 @@ impl Command {
                 .join(commands::get_day_name(day_num))
                 .with_extension("txt");
             fs::File::create(&file_name)?;
-            println!(
-                "Input file '{}' has been created",
-                file_name.to_string_lossy()
-            );
+            println!("File '{}' has been created", file_name.to_string_lossy());
 
             if self.open_input {
                 edit::edit_file(file_name)
