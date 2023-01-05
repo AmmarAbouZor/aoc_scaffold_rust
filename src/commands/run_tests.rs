@@ -9,7 +9,11 @@ use crate::config;
 /// Run unit tests for the last day only
 #[derive(Args, Debug)]
 #[command()]
-pub struct Command {}
+pub struct Command {
+    /// run tests in release mode
+    #[arg(short, long)]
+    release: bool,
+}
 
 impl Command {
     pub fn run(&self) -> Result<()> {
@@ -23,11 +27,15 @@ impl Command {
         dbg!(last_day_num);
         let test_argument = format!("{}::{}", year_name, commands::get_day_name(last_day_num));
 
-        process::Command::new("cargo")
-            .current_dir(project_directory)
-            .arg("test")
-            .arg(test_argument)
-            .status()?;
+        let mut run_tests = process::Command::new("cargo");
+        run_tests.current_dir(project_directory);
+        run_tests.arg("test");
+
+        if self.release {
+            run_tests.arg("-r");
+        }
+
+        run_tests.arg(test_argument).status()?;
 
         Ok(())
     }
