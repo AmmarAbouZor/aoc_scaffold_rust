@@ -8,7 +8,7 @@ use itertools::Itertools;
 use std::{env, fs, path::PathBuf};
 
 #[derive(Parser, Debug)]
-#[command()]
+#[command(author, version, about)]
 pub struct Command {
     #[command(subcommand)]
     command: SubCommands,
@@ -37,21 +37,20 @@ enum SubCommands {
 ///
 /// This function will return an error if any of the files 'Cargo.toml' or 'main.rs' doesn't exist or an io Error.
 pub(crate) fn get_project_directory() -> Result<PathBuf> {
-    // let current_directory = env::current_dir()?;
-    // let cargo_path = current_directory.join("Cargo.toml");
-    // if !cargo_path.try_exists()? {
-    //     bail!("current directory isn't rust project. 'Cargo.toml' could't be found")
-    // }
+    let current_directory = env::current_dir()?;
+    let cargo_path = current_directory.join("Cargo.toml");
+    if !cargo_path.try_exists()? {
+        bail!("current directory isn't rust project. 'Cargo.toml' could't be found")
+    }
 
-    // let main_path = current_directory.join("src").join("main.rs");
+    let main_path = current_directory.join("src").join("main.rs");
 
-    // if !main_path.try_exists()? {
-    //     bail!("current directory isn't rust project. 'main.rs' could't be found")
-    // }
+    if !main_path.try_exists()? {
+        bail!("current directory isn't rust project. 'main.rs' could't be found")
+    }
 
-    // TODO reactivate real implementation and delete env VAR from bashrc and fish
-
-    let current_directory = PathBuf::from(env::var("AOC_TEST_PATH")?);
+    // TODO delete this and the env VAR from bashrc and fish
+    //let current_directory = PathBuf::from(env::var("AOC_TEST_PATH")?);
 
     Ok(current_directory)
 }
