@@ -122,7 +122,7 @@ fn insert_year_main(dir_path: &Path, year: &str) -> Result<()> {
     );
     if text.contains("run_year(\"") {
         lazy_static! {
-            static ref YEAR_ARG_REGEX: Regex = Regex::new(r#"run_year\("."\);"#).unwrap();
+            static ref YEAR_ARG_REGEX: Regex = Regex::new(r#"run_year\(".+"\);"#).unwrap();
         }
 
         text = YEAR_ARG_REGEX.replace(&text, run_func_with_arg).into();
@@ -158,8 +158,9 @@ fn insert_year_main(dir_path: &Path, year: &str) -> Result<()> {
 }
 
 fn append_next_day(src_path: &Path, year: &str) -> Result<u8> {
-    let year_dir_path = src_path.join(commands::get_year_name(year));
+    update_year_main(src_path, year)?;
 
+    let year_dir_path = src_path.join(commands::get_year_name(year));
     let last_day_num = commands::get_last_day(&year_dir_path)?;
     let next_day = last_day_num + 1;
     generate_day_file(&year_dir_path, next_day)?;
@@ -167,6 +168,30 @@ fn append_next_day(src_path: &Path, year: &str) -> Result<u8> {
     let year_file_path = year_dir_path.with_extension("rs");
     insert_day_in_year(&year_file_path, next_day)?;
     Ok(next_day)
+}
+
+fn update_year_main(dir_path: &Path, year: &str) -> Result<()> {
+    let main_path = dir_path.join("main.rs");
+    let mut text = fs::read_to_string(main_path.clone())?;
+
+    // update run_year call in run functions
+    let run_func_with_arg = format!("run_year(\"{year}\");");
+    if text.contains(&run_func_with_arg) {
+        return Ok(());
+    }
+
+    if text.contains("run_year(\"") {
+        lazy_static! {
+            static ref YEAR_ARG_REGEX: Regex = Regex::new(r#"run_year\(".+"\);"#).unwrap();
+        }
+
+        text = YEAR_ARG_REGEX.replace(&text, run_func_with_arg).into();
+    } else {
+        bail!("main content is changed outside of this program, run_year() fn can't be found");
+    }
+
+    fs::write(main_path, text)?;
+    Ok(())
 }
 
 fn insert_day_in_year(year_file_path: &PathBuf, day: u8) -> Result<()> {
@@ -197,7 +222,7 @@ fn insert_day_in_year(year_file_path: &PathBuf, day: u8) -> Result<()> {
     // insert in run functions
     if text.contains("run_day(") {
         lazy_static! {
-            static ref DAY_FUNC_REGEX: Regex = Regex::new(r#"run_day\(.\);"#).unwrap();
+            static ref DAY_FUNC_REGEX: Regex = Regex::new(r#"run_day\(.+\);"#).unwrap();
         }
 
         let run_func_with_arg = format!("run_day({day});");
