@@ -121,11 +121,9 @@ fn insert_year_main(dir_path: &Path, year: &str) -> Result<()> {
         commands::get_year_name(year)
     );
     if text.contains("run_year(\"") {
-        lazy_static! {
-            static ref YEAR_ARG_REGEX: Regex = Regex::new(r#"run_year\(".+"\);"#).unwrap();
-        }
+        let run_year_regex = get_run_year_regex();
 
-        text = YEAR_ARG_REGEX.replace(&text, run_func_with_arg).into();
+        text = run_year_regex.replace(&text, run_func_with_arg).into();
 
         // year match
         let insert_index_match = text
@@ -157,6 +155,14 @@ fn insert_year_main(dir_path: &Path, year: &str) -> Result<()> {
     Ok(())
 }
 
+fn get_run_year_regex() -> &'static Regex {
+    lazy_static! {
+        static ref YEAR_ARG_REGEX: Regex = Regex::new(r#"run_year\(".+"\);"#).unwrap();
+    }
+
+    &YEAR_ARG_REGEX
+}
+
 fn append_next_day(src_path: &Path, year: &str) -> Result<u8> {
     update_year_main(src_path, year)?;
 
@@ -181,11 +187,8 @@ fn update_year_main(dir_path: &Path, year: &str) -> Result<()> {
     }
 
     if text.contains("run_year(\"") {
-        lazy_static! {
-            static ref YEAR_ARG_REGEX: Regex = Regex::new(r#"run_year\(".+"\);"#).unwrap();
-        }
-
-        text = YEAR_ARG_REGEX.replace(&text, run_func_with_arg).into();
+        let run_year_regex = get_run_year_regex();
+        text = run_year_regex.replace(&text, run_func_with_arg).into();
     } else {
         bail!("main content is changed outside of this program, run_year() fn can't be found");
     }
