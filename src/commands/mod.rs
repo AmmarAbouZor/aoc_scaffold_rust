@@ -26,8 +26,11 @@ impl Command {
 
 #[derive(Subcommand, Debug)]
 enum SubCommands {
+    #[clap(visible_alias = "c")]
     Config(config::Command),
+    #[clap(visible_alias = "n")]
     NextDay(next_day::Command),
+    #[clap(visible_alias = "t")]
     RunTest(run_tests::Command),
 }
 

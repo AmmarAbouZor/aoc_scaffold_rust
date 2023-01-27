@@ -14,9 +14,13 @@ pub struct Command {
 
 #[derive(Subcommand, Debug)]
 enum SubCommands {
+    #[clap(visible_alias = "sy")]
     SetYear(SetYearCommand),
+    #[clap(visible_alias = "gy")]
     GetYear(GetYearCommand),
+    #[clap(visible_alias = "oc")]
     Open(OpenConfigCommand),
+    #[clap(visible_alias = "gp")]
     GetPath(GetPathCommand),
 }
 
