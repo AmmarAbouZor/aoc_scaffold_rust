@@ -10,6 +10,7 @@ description = "Cli tool to scaffold source code for advnent of solutions in rust
 [dependencies]
 anyhow = "1.0.68"
 clap = { version = "4.0.32", features = ["derive"] }
+clap_complete = "4.1.1"
 confy = "0.5.1"
 edit = "0.1.4"
 itertools = "0.10.5"

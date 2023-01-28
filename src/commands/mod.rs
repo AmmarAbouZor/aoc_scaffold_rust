@@ -1,3 +1,4 @@
+mod complete;
 mod config;
 mod next_day;
 mod run_tests;
@@ -20,6 +21,7 @@ impl Command {
             SubCommands::Config(cmd) => cmd.run(),
             SubCommands::NextDay(cmd) => cmd.run(),
             SubCommands::RunTest(cmd) => cmd.run(),
+            SubCommands::Complete(cmd) => cmd.run(),
         }
     }
 }
@@ -32,6 +34,8 @@ enum SubCommands {
     NextDay(next_day::Command),
     #[clap(visible_alias = "t")]
     RunTest(run_tests::Command),
+    #[clap(visible_alias = "comp")]
+    Complete(complete::Command),
 }
 
 /// Checks if the current directory is an executable rust project and return it.
