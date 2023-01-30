@@ -1,7 +1,7 @@
 
 # aoc_scaffold_rust
 
-Cli tool written in rust to scaffold the source code for advnent of solutions in the rust programming language with a template including unit tests + a unit tests runner.
+Cli tool written in rust to scaffold the source code for [advnent of code](https://adventofcode.com/) solutions in the rust programming language with a template including unit tests + a unit tests runner.
 
 
 ## Features
