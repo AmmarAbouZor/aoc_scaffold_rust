@@ -1,7 +1,7 @@
 use anyhow::Result;
 
 fn main() -> Result<()> {
-    aoc_scaff::run()?;
+    aoc_scaffold_rust::run()?;
 
     Ok(())
 }

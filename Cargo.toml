@@ -1,9 +1,13 @@
 [package]
-name = "aoc_scaff"
+name = "aoc_scaffold_rust"
 version = "0.1.0"
 edition = "2021"
 authors = ["Ammar Abou Zor"]
 description = "Cli tool to scaffold source code for advnent of solutions in rust programming language in rust programming language in rust programming language. It can also call unit tests for the current day"
+
+[[bin]]
+name = "aoc_scaffold"
+path = "src/main.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
