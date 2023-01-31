@@ -15,7 +15,7 @@ pub struct Command {
 impl Command {
     pub fn run(&self) -> Result<()> {
         let mut cmd = crate::commands::Command::command();
-        let bin_name = cmd.get_name().to_string();
+        let bin_name = cmd.get_bin_name().unwrap().to_string();
 
         generate(self.shell, &mut cmd, bin_name, &mut io::stdout());
 

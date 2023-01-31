@@ -9,7 +9,7 @@ use itertools::Itertools;
 use std::{env, fs, path::PathBuf};
 
 #[derive(Parser, Debug)]
-#[command(author, version, about)]
+#[command(author, bin_name = "aoc_scaffold", version, about)]
 pub struct Command {
     #[command(subcommand)]
     command: SubCommands,
