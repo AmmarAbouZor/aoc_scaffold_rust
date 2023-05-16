@@ -17,7 +17,7 @@ This tool can:
 Install directly from github:
 
 ```bash
-cargo install --git https://github.com/ammarabouzor/aoc_scaffold_rust
+cargo install --git https://github.com/AmmarAbouZor/aoc_scaffold_rust
 
 ```
     
