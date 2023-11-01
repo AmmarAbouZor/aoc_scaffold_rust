@@ -29,40 +29,40 @@ fn create_year(src_path: &Path, year: &str) -> Result<u8> {
     let year_dir_path = src_path.join(commands::get_year_name(year));
     fs::create_dir(year_dir_path.clone())?;
 
-    generate_day_file(&year_dir_path, 1)?;
+    generate_day_file(&year_dir_path, year, 1)?;
     generate_year_file(src_path, year)?;
     insert_year_main(src_path, year)?;
     Ok(1)
 }
 
-fn generate_day_file(year_dir_path: &Path, day: u8) -> Result<()> {
-    lazy_static! {
-        static ref DAY_TEMPLATE: &'static str = r#"use crate::utls::read_text_from_file;
+fn generate_day_file(year_dir_path: &Path, year: &str, day: u8) -> Result<()> {
+    let day_template: String = format!(
+        "use crate::utls::read_text_from_file;
 
-fn part_1(input: &str) {}
-fn part_2(input: &str) {}
+fn part_1(input: &str) {{}}
+fn part_2(input: &str) {{}}
 
-pub fn run() {
-    let input = read_text_from_file("TODO", "TODO");
+pub fn run() {{
+    let input = read_text_from_file(\"{year}\", \"{day:02}\");
     part_1(&input);
     part_2(&input);
-}
+}}
 
 #[cfg(test)]
-mod test {
+mod test {{
     use super::*;
 
-    const INPUT: &str = "";
+    const INPUT: &str = \"\";
 
     #[test]
-    fn test_() {}
-}"#;
-    }
+    fn test_() {{}}
+}}"
+    );
 
     let file_path = year_dir_path
         .join(commands::get_day_name(day))
         .with_extension("rs");
-    fs::write(&file_path, *DAY_TEMPLATE)?;
+    fs::write(&file_path, day_template.as_str())?;
 
     println!("File '{}' has been created", file_path.to_string_lossy());
 
@@ -174,7 +174,7 @@ fn append_next_day(src_path: &Path, year: &str) -> Result<u8> {
     let year_dir_path = src_path.join(commands::get_year_name(year));
     let last_day_num = commands::get_last_day(&year_dir_path)?;
     let next_day = last_day_num + 1;
-    generate_day_file(&year_dir_path, next_day)?;
+    generate_day_file(&year_dir_path, year, next_day)?;
 
     let year_file_path = year_dir_path.with_extension("rs");
     insert_day_in_year(&year_file_path, next_day)?;
