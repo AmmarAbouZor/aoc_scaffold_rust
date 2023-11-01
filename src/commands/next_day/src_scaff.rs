@@ -230,7 +230,7 @@ fn insert_day_in_year(year_file_path: &PathBuf, day: u8) -> Result<()> {
     // insert in run functions
     if text.contains("run_day(") {
         lazy_static! {
-            static ref DAY_FUNC_REGEX: Regex = Regex::new(r#"run_day\(.+\);"#).unwrap();
+            static ref DAY_FUNC_REGEX: Regex = Regex::new(r"run_day\(.+\);").unwrap();
         }
 
         let run_func_with_arg = format!("run_day({day});");
