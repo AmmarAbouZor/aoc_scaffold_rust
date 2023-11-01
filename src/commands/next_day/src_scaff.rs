@@ -37,21 +37,26 @@ fn create_year(src_path: &Path, year: &str) -> Result<u8> {
 
 fn generate_day_file(year_dir_path: &Path, day: u8) -> Result<()> {
     lazy_static! {
-        static ref DAY_TEMPLATE: &'static str = r"fn part_1() {}
-fn part_2() {}
+        static ref DAY_TEMPLATE: &'static str = r#"use crate::utls::read_text_from_file;
+
+fn part_1(input: &str) {}
+fn part_2(input: &str) {}
 
 pub fn run() {
-    part_1();
-    part_2();
+    let input = read_text_from_file("TODO", "TODO");
+    part_1(&input);
+    part_2(&input);
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
 
+    const INPUT: &str = "";
+
     #[test]
     fn test_() {}
-}";
+}"#;
     }
 
     let file_path = year_dir_path
