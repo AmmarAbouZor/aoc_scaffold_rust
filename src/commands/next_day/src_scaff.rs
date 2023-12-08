@@ -55,7 +55,7 @@ mod test {{
     const INPUT: &str = \"\";
 
     #[test]
-    fn test_() {{}}
+    fn test_solution() {{}}
 }}"
     );
 
