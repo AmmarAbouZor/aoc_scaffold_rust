@@ -40,6 +40,7 @@ fn generate_day_file(year_dir_path: &Path, year: &str, day: u8) -> Result<()> {
         "use crate::utls::read_text_from_file;
 
 fn part_1(input: &str) {{}}
+
 fn part_2(input: &str) {{}}
 
 pub fn run() {{
