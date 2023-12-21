@@ -39,14 +39,14 @@ fn generate_day_file(year_dir_path: &Path, year: &str, day: u8) -> Result<()> {
     let day_template: String = format!(
         "use crate::utls::read_text_from_file;
 
-fn part_1(input: &str) {{}}
+fn part_1(input: &'static str) {{}}
 
-fn part_2(input: &str) {{}}
+fn part_2(input: &'static str) {{}}
 
 pub fn run() {{
-    let input = read_text_from_file(\"{year}\", \"{day:02}\");
-    part_1(&input);
-    part_2(&input);
+    let input = read_text_from_file(\"{year}\", \"{day:02}\").leak();
+    part_1(input);
+    part_2(input);
 }}
 
 #[cfg(test)]
