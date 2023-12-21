@@ -37,14 +37,14 @@ fn create_year(src_path: &Path, year: &str) -> Result<u8> {
 
 fn generate_day_file(year_dir_path: &Path, year: &str, day: u8) -> Result<()> {
     let day_template: String = format!(
-        "use crate::utls::read_text_from_file;
-
-fn part_1(input: &'static str) {{}}
+        "fn part_1(input: &'static str) {{}}
 
 fn part_2(input: &'static str) {{}}
 
 pub fn run() {{
-    let input = read_text_from_file(\"{year}\", \"{day:02}\").leak();
+    //TODO: uncomment the first input and remove the later when the solution is solved 
+    // let input = crate::utls::read_text_from_file(\"{year}\", \"{day:02}\").leak();
+    let input = crate::include_input!(\"{year}\", \"{day:02}\");
     part_1(input);
     part_2(input);
 }}
