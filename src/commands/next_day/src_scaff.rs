@@ -42,9 +42,7 @@ fn generate_day_file(year_dir_path: &Path, year: &str, day: u8) -> Result<()> {
 fn part_2(input: &'static str) {{}}
 
 pub fn run() {{
-    //TODO: uncomment the first input and remove the later when the solution is solved 
-    // let input = crate::utls::read_text_from_file(\"{year}\", \"{day:02}\").leak();
-    let input = crate::include_input!(\"{year}\", \"{day:02}\");
+    let input = crate::utls::read_text_from_file(\"{year}\", \"{day:02}\").leak();
     part_1(input);
     part_2(input);
 }}
